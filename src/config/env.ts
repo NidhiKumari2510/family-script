@@ -16,7 +16,6 @@ const envSchema = z.object({
   GITHUB_CLIENT_ID: z.string().min(1, "GITHUB_CLIENT_ID is required"),
   GITHUB_CLIENT_SECRET: z.string().min(1, "GITHUB_CLIENT_SECRET is required"),
 
-  APP_URL: z.string().url().optional(),
   CORS_ORIGIN: z.string().min(1, "CORS_ORIGIN is required"),
   PORT: z.coerce.number().int().positive(),
   NODE_ENV: z.enum(["development", "test", "production"]),

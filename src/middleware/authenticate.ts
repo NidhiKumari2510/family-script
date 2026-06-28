@@ -28,8 +28,9 @@ export async function authenticate(
 ): Promise<NextResponse | null> {
   const sessionCookie = getSessionCookie(request.headers);
   const authorizationHeader = request.headers.get("authorization");
+  const hasBearerToken = authorizationHeader?.startsWith("Bearer ");
 
-  if (!sessionCookie && !authorizationHeader) {
+  if (!sessionCookie && !hasBearerToken) {
     return unauthorizedResponse();
   }
 

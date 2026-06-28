@@ -5,7 +5,7 @@ import { bearer } from "better-auth/plugins";
 import { prisma } from "./database";
 import { env } from "./env";
 
-const baseURL = env.APP_URL ?? `http://localhost:${env.PORT}`;
+const baseURL = `http://localhost:${env.PORT}`;
 
 export const auth = betterAuth({
   baseURL,
