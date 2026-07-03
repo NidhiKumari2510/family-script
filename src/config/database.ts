@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { env } from "./env";
 
+// A2: Construct Prisma through one singleton so hot reloads do not create extra database connections.
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log:

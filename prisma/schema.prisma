@@ -1,3 +1,4 @@
+// Developer A owns the Prisma schema for authentication infrastructure and shared domain relations.
 generator client {
   provider = "prisma-client-js"
 }

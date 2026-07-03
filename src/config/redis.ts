@@ -16,6 +16,7 @@ const BASE_RETRY_DELAY_MS = 100;
 const MAX_RETRY_DELAY_MS = 2_000;
 const RETRY_JITTER_PERCENTAGE = 0.2;
 
+// A3: Central Redis client with JSON helpers, retry handling, and shared connection lifecycle.
 class RedisClient extends EventEmitter {
   private socket: net.Socket | tls.TLSSocket | null = null;
   private buffer = Buffer.alloc(0);
