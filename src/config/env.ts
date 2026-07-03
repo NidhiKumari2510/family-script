@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// A1: Keep all required runtime configuration in one place so other files do not read process.env directly.
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   DIRECT_URL: z.string().min(1, "DIRECT_URL is required"),
