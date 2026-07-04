@@ -78,6 +78,7 @@ model Account {
 
   accessToken  String?
   refreshToken String?
+  password     String?
 
   expiresAt DateTime?
 
