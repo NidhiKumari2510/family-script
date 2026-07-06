@@ -1,3 +1,4 @@
 import { authController } from "./auth.controller";
 
-export const POST = authController.register;
+export const registerHandler = authController.register;
+export const loginHandler = authController.login;

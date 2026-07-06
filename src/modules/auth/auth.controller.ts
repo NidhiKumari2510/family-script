@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { authService } from "./auth.service";
-import { registerSchema } from "./auth.validators";
+import { loginSchema, registerSchema } from "./auth.validators";
 
 export const authController = {
   async register(request: Request) {
@@ -56,6 +56,68 @@ export const authController = {
     } catch (error) {
       // Unexpected/server errors
       console.error("[auth.register] Unexpected error:", error);
+
+      return NextResponse.json(
+        { success: false, message: "Something went wrong. Please try again." },
+        { status: 500 },
+      );
+    }
+  },
+  // Add this below register in the existing authController object
+
+  async login(request: Request) {
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Request body must be valid JSON." },
+        { status: 400 },
+      );
+    }
+
+    const parsed = loginSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid login payload.",
+          errors: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
+    try {
+      const result = await authService.loginUser(parsed.data);
+
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, message: result.message },
+          { status: result.status },
+        );
+      }
+
+      const res = NextResponse.json(
+        {
+          success: true,
+          message: "Login successful.",
+          data: { id: result.userId, email: result.email },
+        },
+        { status: 200 },
+      );
+
+      // Forward Better Auth's session cookie to the client so subsequent
+      // requests are authenticated.
+      if (result.setCookieHeader) {
+        res.headers.set("set-cookie", result.setCookieHeader);
+      }
+
+      return res;
+    } catch (error) {
+      console.error("[auth.login] Unexpected error:", error);
 
       return NextResponse.json(
         { success: false, message: "Something went wrong. Please try again." },
