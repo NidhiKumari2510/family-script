@@ -63,7 +63,6 @@ export const authController = {
       );
     }
   },
-  // Add this below register in the existing authController object
 
   async login(request: Request) {
     let body: unknown;
