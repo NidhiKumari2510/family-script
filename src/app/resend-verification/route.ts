@@ -1,0 +1,1 @@
+export { resendVerificationHandler as POST } from "@/modules/auth/auth.router";

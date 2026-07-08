@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import { authService } from "./auth.service";
 import { loginSchema, registerSchema } from "./auth.validators";
-import { authenticate, type AuthenticatedRequest } from "@/middleware/authenticate";
+import {
+  authenticate,
+  type AuthenticatedRequest,
+} from "@/middleware/authenticate";
+import { resendVerificationSchema, verifyEmailSchema } from "./auth.validators";
 
 export const authController = {
   async register(request: Request) {
@@ -150,5 +154,103 @@ export const authController = {
       },
       { status: 200 },
     );
+  },
+
+  async verifyEmail(request: Request) {
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Request body must be valid JSON." },
+        { status: 400 },
+      );
+    }
+
+    const parsed = verifyEmailSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid payload.",
+          errors: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
+    try {
+      const result = await authService.verifyEmail(parsed.data);
+
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, message: result.message },
+          { status: result.status },
+        );
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Email verified successfully." },
+        { status: 200 },
+      );
+    } catch (error) {
+      console.error("[auth.verifyEmail] Unexpected error:", error);
+
+      return NextResponse.json(
+        { success: false, message: "Something went wrong. Please try again." },
+        { status: 500 },
+      );
+    }
+  },
+
+  async resendVerification(request: Request) {
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Request body must be valid JSON." },
+        { status: 400 },
+      );
+    }
+
+    const parsed = resendVerificationSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid payload.",
+          errors: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
+    try {
+      const result = await authService.resendVerification(parsed.data);
+
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, message: result.message },
+          { status: result.status },
+        );
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Verification email sent." },
+        { status: 200 },
+      );
+    } catch (error) {
+      console.error("[auth.resendVerification] Unexpected error:", error);
+
+      return NextResponse.json(
+        { success: false, message: "Something went wrong. Please try again." },
+        { status: 500 },
+      );
+    }
   },
 };
