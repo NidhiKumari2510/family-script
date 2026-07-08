@@ -61,6 +61,11 @@ model User {
   auditLogs     AuditLog[]
   errorLogs     ErrorLog[]
 
+  // ===== ADMIN APIS =====
+  heroContent   HeroContent[]
+  aboutContent  AboutContent[]
+  announcements Announcement[]
+
   @@index([deletedAt])
 }
 
@@ -857,4 +862,51 @@ model ErrorLog {
   @@index([errorType])
 
   @@index([createdAt])
+}
+
+model HeroContent {
+  id            String   @id @default(cuid())
+  heading       String
+  subheading    String
+  ctaText       String
+  ctaUrl        String
+  updatedAt     DateTime @updatedAt
+  updatedBy     String
+  updatedByUser User     @relation(fields: [updatedBy], references: [id])
+
+  @@map("hero_content")
+}
+
+model AboutContent {
+  id            String   @id @default(cuid())
+  title         String
+  body          String
+  updatedAt     DateTime @updatedAt
+  updatedBy     String
+  updatedByUser User     @relation(fields: [updatedBy], references: [id])
+
+  @@map("about_content")
+}
+
+model Announcement {
+  id            String             @id @default(cuid())
+  title         String
+  body          String
+  status        AnnouncementStatus @default(DRAFT)
+  publishedAt   DateTime?
+  expiresAt     DateTime?
+  createdBy     String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  createdByUser User               @relation(fields: [createdBy], references: [id])
+
+  @@index([status])
+  @@index([createdBy])
+  @@map("announcement")
+}
+
+enum AnnouncementStatus {
+  ACTIVE
+  DRAFT
+  EXPIRED
 }
