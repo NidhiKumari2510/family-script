@@ -1,1 +1,1 @@
-export { POST } from "@/modules/auth/auth.router";
+export { registerHandler as POST } from "@/modules/auth/auth.router";
