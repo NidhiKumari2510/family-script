@@ -63,6 +63,9 @@ export const auth = betterAuth({
     // A5 only asks for email/password and verification support; OAuth is intentionally not configured here.
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+    console.info(`Password reset requested for ${user.email}: ${url}`);
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
