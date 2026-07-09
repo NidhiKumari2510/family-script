@@ -128,6 +128,7 @@ model VerificationToken {
 
   expiresAt DateTime
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email])
   @@index([expiresAt])

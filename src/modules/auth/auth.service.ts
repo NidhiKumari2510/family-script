@@ -2,6 +2,14 @@ import { APIError } from "better-auth/api";
 
 import { auth } from "@/config/auth";
 import type { loginSchema, registerSchema } from "./auth.validators";
+import type {
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "./auth.validators";
+import type {
+  resendVerificationSchema,
+  verifyEmailSchema,
+} from "./auth.validators";
 import type { z } from "zod";
 
 type RegisterInput = z.infer<typeof registerSchema>;
@@ -84,6 +92,104 @@ export const authService = {
           success: false,
           status: error.statusCode ?? 401,
           message: error.body?.message ?? error.message ?? "Login failed.",
+        };
+      }
+
+      throw error;
+    }
+  },
+
+  async verifyEmail(input: z.infer<typeof verifyEmailSchema>) {
+    try {
+      // Validates token, marks user verified
+      await auth.api.verifyEmail({
+        query: { token: input.token },
+      });
+
+      return { success: true as const };
+    } catch (error) {
+      if (error instanceof APIError) {
+        return {
+          success: false as const,
+          status: error.statusCode ?? 400,
+          message:
+            error.body?.message ?? error.message ?? "Verification failed.",
+        };
+      }
+
+      throw error;
+    }
+  },
+
+  async resendVerification(input: z.infer<typeof resendVerificationSchema>) {
+    try {
+      // Issues a new token, triggers sendVerificationEmail again
+      await auth.api.sendVerificationEmail({
+        body: { email: input.email },
+      });
+
+      return { success: true as const };
+    } catch (error) {
+      if (error instanceof APIError) {
+        return {
+          success: false as const,
+          status: error.statusCode ?? 400,
+          message:
+            error.body?.message ??
+            error.message ??
+            "Could not resend verification email.",
+        };
+      }
+
+      throw error;
+    }
+  },
+
+  async forgotPassword(input: z.infer<typeof forgotPasswordSchema>) {
+    try {
+      // Issues reset token, triggers Better Auth's password reset email
+      await auth.api.requestPasswordReset({
+        body: {
+          email: input.email,
+          redirectTo: "http://localhost:3000/reset-password",
+        },
+      });
+
+      return { success: true as const };
+    } catch (error) {
+      if (error instanceof APIError) {
+        return {
+          success: false as const,
+          status: error.statusCode ?? 400,
+          message:
+            error.body?.message ??
+            error.message ??
+            "Could not send reset email.",
+        };
+      }
+
+      throw error;
+    }
+  },
+
+  async resetPassword(input: z.infer<typeof resetPasswordSchema>) {
+    try {
+      // Validates token, updates the hashed password on Account
+      await auth.api.resetPassword({
+        body: {
+          token: input.token,
+          newPassword: input.password,
+        },
+      });
+
+      return { success: true as const };
+    } catch (error) {
+      if (error instanceof APIError) {
+        return {
+          success: false as const,
+          status: error.statusCode ?? 400,
+          message:
+            error.body?.message ?? error.message ?? "Password reset failed.",
         };
       }
 
