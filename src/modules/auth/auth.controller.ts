@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { authService } from "./auth.service";
 import { loginSchema, registerSchema } from "./auth.validators";
+import { authenticate, type AuthenticatedRequest } from "@/middleware/authenticate";
 
 export const authController = {
   async register(request: Request) {
@@ -123,5 +124,31 @@ export const authController = {
         { status: 500 },
       );
     }
+  },
+
+  async getCurrentUser(request: Request) {
+    const nextRequest = request as import("next/server").NextRequest;
+
+    // Validates session, attaches user/session, or returns 401
+    const authError = await authenticate(nextRequest);
+
+    if (authError) {
+      return authError;
+    }
+
+    const { user } = nextRequest as AuthenticatedRequest;
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          emailVerified: user.emailVerified,
+        },
+      },
+      { status: 200 },
+    );
   },
 };
