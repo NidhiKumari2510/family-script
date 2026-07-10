@@ -1,0 +1,62 @@
+import { AUTH_ROLES, type AuthRole } from "./roles";
+
+export const AUTH_PERMISSIONS = {
+  TREE_VIEW: "tree:view",
+  TREE_CREATE: "tree:create",
+  TREE_UPDATE: "tree:update",
+  TREE_DELETE: "tree:delete",
+  TREE_MEMBER_INVITE: "tree:member:invite",
+  TREE_MEMBER_UPDATE: "tree:member:update",
+  TREE_MEMBER_REMOVE: "tree:member:remove",
+  STORY_CREATE: "story:create",
+  STORY_UPDATE: "story:update",
+  STORY_DELETE: "story:delete",
+} as const;
+
+export type AuthPermission =
+  (typeof AUTH_PERMISSIONS)[keyof typeof AUTH_PERMISSIONS];
+
+export const PERMISSION_MATRIX = {
+  [AUTH_ROLES.OWNER]: [
+    AUTH_PERMISSIONS.TREE_VIEW,
+    AUTH_PERMISSIONS.TREE_CREATE,
+    AUTH_PERMISSIONS.TREE_UPDATE,
+    AUTH_PERMISSIONS.TREE_DELETE,
+    AUTH_PERMISSIONS.TREE_MEMBER_INVITE,
+    AUTH_PERMISSIONS.TREE_MEMBER_UPDATE,
+    AUTH_PERMISSIONS.TREE_MEMBER_REMOVE,
+    AUTH_PERMISSIONS.STORY_CREATE,
+    AUTH_PERMISSIONS.STORY_UPDATE,
+    AUTH_PERMISSIONS.STORY_DELETE,
+  ],
+  [AUTH_ROLES.ADMIN]: [
+    AUTH_PERMISSIONS.TREE_VIEW,
+    AUTH_PERMISSIONS.TREE_CREATE,
+    AUTH_PERMISSIONS.TREE_UPDATE,
+    AUTH_PERMISSIONS.TREE_MEMBER_INVITE,
+    AUTH_PERMISSIONS.TREE_MEMBER_UPDATE,
+    AUTH_PERMISSIONS.STORY_CREATE,
+    AUTH_PERMISSIONS.STORY_UPDATE,
+    AUTH_PERMISSIONS.STORY_DELETE,
+  ],
+  [AUTH_ROLES.EDITOR]: [
+    AUTH_PERMISSIONS.TREE_VIEW,
+    AUTH_PERMISSIONS.TREE_UPDATE,
+    AUTH_PERMISSIONS.STORY_CREATE,
+    AUTH_PERMISSIONS.STORY_UPDATE,
+  ],
+  [AUTH_ROLES.CONTRIBUTOR]: [
+    AUTH_PERMISSIONS.TREE_VIEW,
+    AUTH_PERMISSIONS.STORY_CREATE,
+  ],
+  [AUTH_ROLES.VIEWER]: [AUTH_PERMISSIONS.TREE_VIEW],
+} as const satisfies Record<AuthRole, readonly AuthPermission[]>;
+
+export function hasPermission(
+  role: AuthRole,
+  permission: AuthPermission,
+): boolean {
+  const permissions = PERMISSION_MATRIX[role] as readonly AuthPermission[];
+
+  return permissions.includes(permission);
+}
