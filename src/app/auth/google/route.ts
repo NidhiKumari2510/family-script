@@ -1,0 +1,1 @@
+export { googleSignInHandler as GET } from "@/modules/auth/auth.router";
