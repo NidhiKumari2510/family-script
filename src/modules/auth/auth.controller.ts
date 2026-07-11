@@ -352,4 +352,11 @@ export const authController = {
       );
     }
   },
+
+  async googleSignIn() {
+    const url = await authService.getGoogleSignInUrl();
+
+    // Redirects the browser straight to Google's consent screen
+    return NextResponse.redirect(url);
+  },
 };

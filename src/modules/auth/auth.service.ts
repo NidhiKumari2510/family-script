@@ -196,4 +196,19 @@ export const authService = {
       throw error;
     }
   },
+
+  async getGoogleSignInUrl() {
+    const result = await auth.api.signInSocial({
+      body: {
+        provider: "google",
+        callbackURL: "/auth/me",
+      },
+    });
+
+    if (!result.url) {
+      throw new Error("Better Auth did not return a Google sign-in URL.");
+    }
+
+    return result.url;
+  },
 };
