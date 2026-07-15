@@ -54,16 +54,10 @@ export const auth = betterAuth({
     },
   },
   account: {
-    // Keep Better Auth's expected account fields aligned with the existing Prisma column names.
-    fields: {
-      providerId: "provider",
-      accountId: "providerAccountId",
-      accessTokenExpiresAt: "expiresAt",
-    },
+  // Prisma schema already uses Better Auth's default field names — no mapping needed.
   },
   verification: {
-    // Email verification tokens are stored in the existing VerificationToken Prisma model.
-    modelName: "verificationToken",
+    modelName: "verification",
     fields: {
       identifier: "email",
       value: "token",
