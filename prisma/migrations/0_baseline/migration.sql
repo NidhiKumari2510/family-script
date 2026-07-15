@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "TreeType" AS ENUM ('FAMILY', 'ORGANIZATION', 'TRIBE');
 
@@ -45,6 +48,9 @@ CREATE TYPE "NotificationType" AS ENUM ('INVITATION', 'MESSAGE', 'STORY', 'MEETI
 
 -- CreateEnum
 CREATE TYPE "ErrorSeverity" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
+
+-- CreateEnum
+CREATE TYPE "AnnouncementStatus" AS ENUM ('ACTIVE', 'DRAFT', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -339,6 +345,45 @@ CREATE TABLE "error_logs" (
     CONSTRAINT "error_logs_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "hero_content" (
+    "id" TEXT NOT NULL,
+    "heading" TEXT NOT NULL,
+    "subheading" TEXT NOT NULL,
+    "ctaText" TEXT NOT NULL,
+    "ctaUrl" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedBy" TEXT NOT NULL,
+
+    CONSTRAINT "hero_content_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "about_content" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedBy" TEXT NOT NULL,
+
+    CONSTRAINT "about_content_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "announcement" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "status" "AnnouncementStatus" NOT NULL DEFAULT 'DRAFT',
+    "publishedAt" TIMESTAMP(3),
+    "expiresAt" TIMESTAMP(3),
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "announcement_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -537,6 +582,12 @@ CREATE INDEX "error_logs_errorType_idx" ON "error_logs"("errorType");
 -- CreateIndex
 CREATE INDEX "error_logs_createdAt_idx" ON "error_logs"("createdAt");
 
+-- CreateIndex
+CREATE INDEX "announcement_status_idx" ON "announcement"("status");
+
+-- CreateIndex
+CREATE INDEX "announcement_createdBy_idx" ON "announcement"("createdBy");
+
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -620,3 +671,13 @@ ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_userId_fkey" FOREIGN KEY ("u
 
 -- AddForeignKey
 ALTER TABLE "error_logs" ADD CONSTRAINT "error_logs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "hero_content" ADD CONSTRAINT "hero_content_updatedBy_fkey" FOREIGN KEY ("updatedBy") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "about_content" ADD CONSTRAINT "about_content_updatedBy_fkey" FOREIGN KEY ("updatedBy") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "announcement" ADD CONSTRAINT "announcement_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
